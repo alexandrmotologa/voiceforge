@@ -151,7 +151,7 @@ export const Visualizer: React.FC<VisualizerProps> = ({
         </div>
 
         {/* Interactive Controls */}
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-wrap items-center justify-center gap-3">
           {!isConnected ? (
             <button
               onClick={onConnect}

@@ -1,6 +1,12 @@
-# VoiceForge
+<p align="center">
+  <img src="docs/images/logo.png?raw=true" alt="VoiceForge Acoustic Owl Logo" width="130" style="border-radius: 24px;" />
+</p>
 
-Open-source real-time voice agent server built in Python 3.12 (aiortc, onnxruntime, fastapi) and React 19.
+<h1 align="center">VoiceForge</h1>
+
+<p align="center">
+  Open-source real-time voice agent server built in Python 3.12 (aiortc, onnxruntime, fastapi) and React 19.
+</p>
 
 VoiceForge provides a self-hosted alternative to the OpenAI Realtime API. It handles low-latency WebRTC audio streaming, executes Silero VAD v5 locally on CPU for sub-80ms barge-in interruptions, and pipelines speech-to-text, streaming language models, and text-to-speech with end-to-end turnaround under 450 milliseconds.
 
@@ -165,6 +171,42 @@ VoiceForge Studio in `web/` includes testing and observability tools built into 
 - **Session Reports**: Export comprehensive call transcripts, latency breakdowns, and tool invocation audits in JSON or Markdown format via `/session/{id}/report`.
 - **Persona Presets**: Instantly switch between Technical Support, Executive Assistant, and Friendly Conversationalist system prompts with tuned temperature and speech rate sliders.
 - **Dynamic Tool Webhook Registration**: Add custom tools at runtime by specifying a tool name, description, JSON schema, and HTTP POST webhook endpoint.
+
+---
+
+## Studio Tools & Diagnostic Features
+
+VoiceForge Studio in `web/` includes testing and observability tools built into the UI:
+
+- **Microphone Selector & Pre-flight VU Meter**: Choose any available audio input device and verify ambient audio and speaking levels before connecting.
+- **Simulated Caller & Prompt Injector**: Send simulated caller utterances or trigger a manual barge-in test to benchmark interruption latency without speaking into the microphone.
+- **WebRTC Network Quality Monitor**: Continuously reads round-trip time (RTT), packet jitter, and packet loss via `RTCPeerConnection.getStats()` every 2 seconds.
+- **Dual-Track WAV Recording Export**: Automatically buffers inbound microphone audio on channel 0 and assistant speech on channel 1. Download the stereo WAV recording at `/session/{id}/recording`.
+- **Session Reports**: Export comprehensive call transcripts, latency breakdowns, and tool invocation audits in JSON or Markdown format via `/session/{id}/report`.
+- **Persona Presets**: Instantly switch between Technical Support, Executive Assistant, and Friendly Conversationalist system prompts with tuned temperature and speech rate sliders.
+- **Dynamic Tool Webhook Registration**: Add custom tools at runtime by specifying a tool name, description, JSON schema, and HTTP POST webhook endpoint.
+
+### Studio Visual Interface
+
+<p align="center">
+  <img src="docs/images/voiceforge-1.png" alt="VoiceForge WebRTC Studio Interface" width="900" />
+</p>
+
+<p align="center">
+  <img src="docs/images/voiceforge-2.png" alt="Engine & Audio Settings with Microphone VU Meter" width="445" />
+  &nbsp;
+  <img src="docs/images/voiceforge-3.png" alt="Persona Presets & Tuned System Prompts" width="445" />
+</p>
+
+### Responsive Multi-Device Design
+
+The interface adapts across screen sizes, from desktop monitors down to tablets and mobile viewports:
+
+<p align="center">
+  <img src="docs/images/voiceforge-tablet.png" alt="VoiceForge Tablet Layout" width="520" />
+  &nbsp;
+  <img src="docs/images/voiceforge-mobile.png" alt="VoiceForge Mobile Layout" width="260" />
+</p>
 
 ---
 

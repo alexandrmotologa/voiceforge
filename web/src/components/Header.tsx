@@ -24,23 +24,23 @@ export const Header: React.FC<HeaderProps> = ({
   hasSession
 }) => {
   return (
-    <header className="h-16 border-b border-slate-800 bg-[#090d16]/90 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-40">
-      <div className="flex items-center space-x-3">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-          <Mic className="w-5 h-5 text-white" />
+    <header className="h-16 border-b border-slate-800 bg-[#090d16]/90 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between sticky top-0 z-40">
+      <div className="flex items-center space-x-2.5 sm:space-x-3">
+        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 shrink-0">
+          <Mic className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
         </div>
         <div>
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-lg tracking-tight text-white">VoiceForge</span>
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-cyan-950/80 text-cyan-400 border border-cyan-800/60 font-medium">
+            <span className="font-bold text-base sm:text-lg tracking-tight text-white">VoiceForge</span>
+            <span className="hidden sm:inline-block text-[10px] sm:text-[11px] font-mono px-2 py-0.5 rounded-full bg-cyan-950/80 text-cyan-400 border border-cyan-800/60 font-medium">
               WebRTC Opus
             </span>
           </div>
-          <p className="text-xs text-slate-400 font-medium">Real-Time Voice Server & Barge-In Gateway</p>
+          <p className="hidden md:block text-xs text-slate-400 font-medium">Real-Time Voice Server & Barge-In Gateway</p>
         </div>
       </div>
 
-      <div className="flex items-center space-x-3 font-mono text-xs">
+      <div className="flex items-center space-x-1.5 sm:space-x-3 font-mono text-xs">
         {/* Network Quality Badge */}
         {networkStats && (
           <div className="hidden md:flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800">
