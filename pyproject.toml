@@ -49,6 +49,7 @@ dependencies = [
     "soundfile>=0.12.1",
     "pyttsx3>=2.90",
     "psutil>=5.9.0",
+    "faster-whisper>=1.0.0",
     "pytest>=8.2.0",
     "pytest-asyncio>=0.23.0"
 ]
