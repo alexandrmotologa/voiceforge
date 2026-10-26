@@ -45,7 +45,7 @@ class WebSocketFallbackHandler:
                 if "bytes" in message and message["bytes"]:
                     # Inbound binary audio PCM chunk from client microphone
                     pcm_chunk = message["bytes"]
-                    session.detector.process_pcm_bytes(pcm_chunk)
+                    session.feed_inbound_pcm(pcm_chunk)
                 elif "text" in message and message["text"]:
                     # Inbound JSON control command
                     try:

@@ -69,7 +69,7 @@ class WebRTCManager:
             if track.kind == "audio":
                 processor = InboundAudioProcessor(
                     track=track,
-                    on_pcm_chunk=session.detector.process_pcm_bytes
+                    on_pcm_chunk=session.feed_inbound_pcm
                 )
                 self.inbound_processors[sid] = processor
                 processor.start()

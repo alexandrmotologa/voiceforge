@@ -20,11 +20,11 @@ class ElevenLabsTTS(BaseTTS):
         self.voice_id = voice_id
         self._fallback = NativePCMTTS()
 
-    async def synthesize(self, text: str) -> bytes:
+    async def synthesize(self, text: str, speech_rate: float = 1.0) -> bytes:
         """Synthesize text via ElevenLabs API."""
         if not self.api_key:
             logger.info("ElevenLabs API key not provided, using native local TTS")
-            return await self._fallback.synthesize(text)
+            return await self._fallback.synthesize(text, speech_rate=speech_rate)
 
         url = f"{self.API_URL}/{self.voice_id}?output_format=pcm_16000"
         headers = {

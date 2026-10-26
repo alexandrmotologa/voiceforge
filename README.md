@@ -14,12 +14,15 @@ VoiceForge provides a self-hosted alternative to the OpenAI Realtime API. It han
 
 - **Full-Duplex WebRTC Gateway**: Connects directly to browsers and mobile clients over UDP with Opus audio encoding (48kHz), with WebSocket streaming fallback.
 - **Sub-80ms Barge-In Controller**: Silero VAD v5 runs in-process via ONNX Runtime (<2ms CPU inference), immediately muting outgoing audio and halting LLM token streams the millisecond user speech is detected.
+- **Acoustic Self-Echo Guard**: Dynamically raises VAD detection thresholds and consecutive frame verification while the assistant audio plays through open laptop speakers, preventing false barge-in loops.
+- **Adaptive Noise Floor Tracker**: Continuously computes ambient background sound levels via exponential moving average to avoid spurious triggers in noisy rooms.
 - **Turnaround Under 450ms**: Overlaps STT output, LLM token streaming, punctuation-based sentence chunking, and TTS synthesis so playback begins on the first sentence.
 - **Dual Pipeline Support**:
   - **Cloud Mode**: Deepgram Nova-2 + Claude 3.5 Sonnet / OpenAI GPT-4o + Cartesia Sonic.
   - **Local Mode (Cost $0)**: Whisper Local / Sherpa-ONNX + Ollama / local LLM + Kokoro-82M / Native PCM.
-- **Conversational Tool Execution**: Asynchronous function calling mid-conversation with natural vocal filler generation ("Let me look into that for you...") to prevent dead air.
-- **Interactive React 19 Studio**: Real-time dual audio visualizer, live latency waterfall chart, conversational transcript, and active tool monitor.
+- **Conversational Tool Execution**: Asynchronous function calling mid-conversation with natural vocal filler generation ("Let me look into that for you...") to prevent dead air. Supports dynamic in-browser webhook tool registration.
+- **Dual-Track Stereo WAV Recorder**: Records synchronized user audio on the left channel and assistant audio on the right channel, downloadable after each call.
+- **Interactive React 19 Studio**: Real-time dual audio visualizer, live latency waterfall chart, conversational transcript, active tool monitor, microphone device selector with live VU meter, WebRTC network quality RTT badge, and session report export (JSON/Markdown).
 
 ---
 
@@ -148,6 +151,20 @@ voiceforge benchmark --frames 1000
 # Test VAD on an existing WAV recording
 voiceforge test-vad path/to/sample.wav --threshold 0.5
 ```
+
+---
+
+## Studio Tools & Diagnostic Features
+
+VoiceForge Studio in `web/` includes testing and observability tools built into the UI:
+
+- **Microphone Selector & Pre-flight VU Meter**: Choose any available audio input device and verify ambient audio and speaking levels before connecting.
+- **Simulated Caller & Prompt Injector**: Send simulated caller utterances or trigger a manual barge-in test to benchmark interruption latency without speaking into the microphone.
+- **WebRTC Network Quality Monitor**: Continuously reads round-trip time (RTT), packet jitter, and packet loss via `RTCPeerConnection.getStats()` every 2 seconds.
+- **Dual-Track WAV Recording Export**: Automatically buffers inbound microphone audio on channel 0 and assistant speech on channel 1. Download the stereo WAV recording at `/session/{id}/recording`.
+- **Session Reports**: Export comprehensive call transcripts, latency breakdowns, and tool invocation audits in JSON or Markdown format via `/session/{id}/report`.
+- **Persona Presets**: Instantly switch between Technical Support, Executive Assistant, and Friendly Conversationalist system prompts with tuned temperature and speech rate sliders.
+- **Dynamic Tool Webhook Registration**: Add custom tools at runtime by specifying a tool name, description, JSON schema, and HTTP POST webhook endpoint.
 
 ---
 

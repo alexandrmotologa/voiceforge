@@ -69,6 +69,7 @@ class PipelineManager:
         stt_name = session.config.get("stt_provider", settings.default_stt_provider)
         llm_name = session.config.get("llm_provider", settings.default_llm_provider)
         tts_name = session.config.get("tts_provider", settings.default_tts_provider)
+        speech_rate = float(session.config.get("speech_rate", 1.0))
 
         stt = self.get_stt(stt_name)
         llm = self.get_llm(llm_name)
@@ -147,7 +148,7 @@ class PipelineManager:
 
                     # Synthesize and enqueue sentence
                     t_tts_start = time.perf_counter()
-                    pcm_audio = await tts.synthesize(sentence)
+                    pcm_audio = await tts.synthesize(sentence, speech_rate=speech_rate)
 
                     if t_first_audio_chunk is None and pcm_audio:
                         t_first_audio_chunk = time.perf_counter()
@@ -156,7 +157,7 @@ class PipelineManager:
                         # Inform VAD detector that assistant is speaking (enables barge-in)
                         session.state = SessionState.AI_SPEAKING
                         session.detector.set_agent_speaking(True)
-                        session.outbound_track.put_audio(pcm_audio, source_sample_rate=16000)
+                        session.queue_outbound_pcm(pcm_audio, source_sample_rate=16000)
 
                         if is_first_sentence:
                             # Record and emit latency waterfall
@@ -189,9 +190,9 @@ class PipelineManager:
                 for sentence in remaining_sentences:
                     if session.abort_event.is_set():
                         break
-                    pcm_audio = await tts.synthesize(sentence)
+                    pcm_audio = await tts.synthesize(sentence, speech_rate=speech_rate)
                     if pcm_audio and not session.abort_event.is_set():
-                        session.outbound_track.put_audio(pcm_audio, source_sample_rate=16000)
+                        session.queue_outbound_pcm(pcm_audio, source_sample_rate=16000)
 
             # Record assistant response in conversation history
             complete_text = "".join(full_assistant_response).strip()

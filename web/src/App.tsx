@@ -4,6 +4,7 @@ import { Visualizer } from './components/Visualizer';
 import { LatencyWaterfall } from './components/LatencyWaterfall';
 import { TranscriptView } from './components/TranscriptView';
 import { ToolMonitor } from './components/ToolMonitor';
+import { SimulatedCaller } from './components/SimulatedCaller';
 import { SettingsModal } from './components/SettingsModal';
 import { useWebRTCVoice } from './hooks/useWebRTCVoice';
 import { useAudioVisualizer } from './hooks/useAudioVisualizer';
@@ -15,36 +16,50 @@ export const App: React.FC = () => {
     llm_provider: 'fallback',
     tts_provider: 'native',
     vad_threshold: 0.5,
-    voice_id: 'en_default'
+    voice_id: 'en_default',
+    speech_rate: 1.0,
+    system_prompt: 'You are VoiceForge, an ultra-fast conversational AI voice assistant.'
   });
+
+  const [selectedAudioDeviceId, setSelectedAudioDeviceId] = useState<string>('');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const {
     connectionState,
     sessionState,
+    sessionId,
     transcripts,
     metrics,
     metricsHistory,
     latestBargeIn,
     toolCalls,
+    networkStats,
     errorMsg,
     localStream,
     connect,
     disconnect,
-    manualInterrupt
+    manualInterrupt,
+    injectPrompt,
+    downloadRecording,
+    exportReport
   } = useWebRTCVoice();
 
   const { volume } = useAudioVisualizer(localStream, connectionState === 'connected');
 
   const isLocalMode = config.stt_provider === 'fallback' && config.llm_provider === 'fallback';
+  const isConnected = connectionState === 'connected';
 
   return (
     <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col font-sans">
       <Header
         connectionState={connectionState}
         latestMetrics={metrics}
+        networkStats={networkStats}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onDownloadRecording={downloadRecording}
+        onExportReport={exportReport}
         isLocalMode={isLocalMode}
+        hasSession={Boolean(sessionId)}
       />
 
       {errorMsg && (
@@ -63,7 +78,7 @@ export const App: React.FC = () => {
           sessionState={sessionState}
           audioVolume={volume}
           latestBargeIn={latestBargeIn}
-          onConnect={() => connect(config)}
+          onConnect={() => connect(config, selectedAudioDeviceId)}
           onDisconnect={disconnect}
           onInterrupt={manualInterrupt}
         />
@@ -72,6 +87,13 @@ export const App: React.FC = () => {
         <LatencyWaterfall
           metrics={metrics}
           history={metricsHistory}
+        />
+
+        {/* Simulated Caller & Prompt Injector */}
+        <SimulatedCaller
+          isConnected={isConnected}
+          onInjectPrompt={injectPrompt}
+          onTriggerBargeIn={manualInterrupt}
         />
 
         {/* Two-column layout: Dialogue transcript & Tool execution */}
@@ -96,6 +118,8 @@ export const App: React.FC = () => {
         onClose={() => setIsSettingsOpen(false)}
         config={config}
         onSaveConfig={(newCfg) => setConfig(newCfg)}
+        selectedAudioDeviceId={selectedAudioDeviceId}
+        onSelectAudioDevice={setSelectedAudioDeviceId}
       />
     </div>
   );

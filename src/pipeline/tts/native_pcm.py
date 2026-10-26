@@ -18,15 +18,15 @@ class NativePCMTTS(BaseTTS):
     def __init__(self, voice_id: Optional[str] = None):
         self.voice_id = voice_id
 
-    async def synthesize(self, text: str) -> bytes:
-        """Render text into 16-bit 16kHz mono linear PCM audio bytes."""
+    async def synthesize(self, text: str, speech_rate: float = 1.0) -> bytes:
+        """Render text into 16-bit 16kHz mono linear PCM audio bytes with dynamic rate control."""
         if not text.strip():
             return b""
 
         # Run speech synthesis in background thread
-        return await asyncio.to_thread(self._synthesize_sync, text)
+        return await asyncio.to_thread(self._synthesize_sync, text, speech_rate)
 
-    def _synthesize_sync(self, text: str) -> bytes:
+    def _synthesize_sync(self, text: str, speech_rate: float = 1.0) -> bytes:
         """Synchronous synthesis worker executed in thread pool."""
         # Try native platform TTS first
         try:
@@ -42,7 +42,9 @@ class NativePCMTTS(BaseTTS):
             try:
                 import pyttsx3
                 engine = pyttsx3.init()
-                engine.setProperty("rate", 190)
+                # Dynamically set speech rate based on multiplier (default 190 WPM)
+                target_wpm = int(max(120, min(300, 190 * speech_rate)))
+                engine.setProperty("rate", target_wpm)
                 engine.setProperty("volume", 1.0)
 
                 with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp_file:
@@ -84,15 +86,15 @@ class NativePCMTTS(BaseTTS):
             logger.debug("Native pyttsx3 synthesis bypassed: %s", e)
 
         # High quality formant speech fallback (guaranteed to never fail or block)
-        return self._generate_procedural_speech(text)
+        return self._generate_procedural_speech(text, speech_rate)
 
-    def _generate_procedural_speech(self, text: str) -> bytes:
+    def _generate_procedural_speech(self, text: str, speech_rate: float = 1.0) -> bytes:
         """Generate smooth vocal-like formant tones matching word syllables for testing."""
         words = text.split()
         total_audio = []
 
         for word in words:
-            duration_sec = max(0.12, min(0.35, len(word) * 0.04))
+            duration_sec = max(0.08, min(0.35, len(word) * 0.04)) / max(0.5, speech_rate)
             num_samples = int(self.SAMPLE_RATE * duration_sec)
             t = np.linspace(0, duration_sec, num_samples, endpoint=False)
 

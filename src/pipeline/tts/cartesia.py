@@ -21,11 +21,11 @@ class CartesiaTTS(BaseTTS):
         self.voice_id = voice_id
         self._fallback = NativePCMTTS()
 
-    async def synthesize(self, text: str) -> bytes:
+    async def synthesize(self, text: str, speech_rate: float = 1.0) -> bytes:
         """Synthesize text using Cartesia Sonic REST API with 16kHz linear PCM output."""
         if not self.api_key:
             logger.info("Cartesia API key not provided, using native local TTS")
-            return await self._fallback.synthesize(text)
+            return await self._fallback.synthesize(text, speech_rate=speech_rate)
 
         headers = {
             "X-API-Key": self.api_key,
